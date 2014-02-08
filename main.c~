@@ -1,0 +1,291 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdlib.h>
+void OtwarciePlikow();
+//////////
+struct EnigmaStruct {
+int rotor1[64];
+int rotor2[64];
+int rotor3[64];
+int rotorrev[32];
+int initpos1;//900
+int initpos2;//+904
+int initpos3;
+int rotorrev2[32];
+int rotor1rev[64];
+int rotor2rev[64];
+int rotor3rev[64];//+1804
+int rots1;//1808
+int rots2;
+int rots3;
+};
+FILE *in;
+FILE *out;
+FILE *rotors;
+FILE *init;
+char bufin[1024];
+char* bufout;
+char workbuf[1024];
+char examplebuf[1024];
+int maxline = 1024;
+char bufrot = 'a';
+extern int enigma(char *intxt, char *outtxt, struct EnigmaStruct * en);
+void WczytajLinie();
+void ZapiszLinie();
+void Error(int i);
+void ZamknieciePlikow();
+void WczytajInitPos(struct EnigmaStruct* data);
+void WczytajRotor1(struct EnigmaStruct* data);
+void WczytajRotor2(struct EnigmaStruct* data);
+void WczytajRotor3(struct EnigmaStruct* data);
+void WczytajRotorrev(struct EnigmaStruct* data);
+int ZaszyfrujPlaintext(struct EnigmaStruct* data);
+
+int main(int argc, char* argv[])
+{
+	struct EnigmaStruct* data = (struct EnigmaStruct*)malloc(sizeof(struct EnigmaStruct));
+	OtwarciePlikow();
+	WczytajRotor1(data);
+	WczytajRotor2(data);
+	WczytajRotor3(data);
+	WczytajRotorrev(data);
+	WczytajInitPos(data);
+	ZaszyfrujPlaintext(data);
+	ZamknieciePlikow();
+
+
+
+
+   	printf("\nHello world2!\n");
+
+    return 1;
+}
+//funkcje:
+int ZaszyfrujPlaintext(struct EnigmaStruct* data)
+{
+    do
+    {
+        WczytajLinie();
+        bufout = (char*) malloc(1024*sizeof(char));
+        int a =enigma(bufin, bufout, data);
+        ZapiszLinie();
+    }while(bufin[0] != '\n');
+}
+void WczytajRotor1(struct EnigmaStruct* data)
+{
+int index = -1;
+    do{                          //odfiltruj etykiete
+    bufrot = getc(rotors);
+    }while(bufrot != '\n');
+
+    while(bufrot != EOF && index != 63){
+	int x1, y1, x2, y2, wart1, wart2;
+
+	// lewa wartosc
+        bufrot = getc(rotors);
+        x1 = atoi(&bufrot);
+        bufrot = getc(rotors);
+        y1 = atoi(&bufrot);
+	wart1 = (x1*10)+y1;
+
+	// odfiltruj kreske
+        bufrot = getc(rotors);
+
+	// prawa wartosc
+        bufrot = getc(rotors);
+        x2 = atoi(&bufrot);
+        bufrot = getc(rotors);
+        y2 = atoi(&bufrot);
+	wart2 = (x2*10)+y2;
+
+	++index;
+	data->rotor1[index] = wart2;
+	data->rotor1rev[wart2] = wart1;
+
+        bufrot = getc(rotors);                          //odfiltruj enter
+    }
+}
+void WczytajRotor2(struct EnigmaStruct* data)
+{
+int index = -1;
+    do{                          //odfiltruj etykiete
+    bufrot = getc(rotors);
+    }while(bufrot != '\n');
+
+    while(bufrot != EOF && index != 63){
+	int x1, y1, x2, y2, wart1, wart2;
+
+	// lewa wartosc
+        bufrot = getc(rotors);
+        x1 = atoi(&bufrot);
+        bufrot = getc(rotors);
+        y1 = atoi(&bufrot);
+	wart1 = (x1*10)+y1;
+
+	// odfiltruj kreske
+        bufrot = getc(rotors);
+
+	// prawa wartosc
+        bufrot = getc(rotors);
+        x2 = atoi(&bufrot);
+        bufrot = getc(rotors);
+        y2 = atoi(&bufrot);
+	wart2 = (x2*10)+y2;
+
+	++index;
+	data->rotor2[index] = wart2;
+	data->rotor2rev[wart2] = wart1;
+
+        bufrot = getc(rotors);                          //odfiltruj enter
+    }
+}
+void WczytajRotor3(struct EnigmaStruct* data)
+{
+int index = -1;
+    do{                          //odfiltruj etykiete
+    bufrot = getc(rotors);
+    }while(bufrot != '\n');
+
+    while(bufrot != EOF && index != 63){
+	int x1, y1, x2, y2, wart1, wart2;
+
+	// lewa wartosc
+        bufrot = getc(rotors);
+        x1 = atoi(&bufrot);
+        bufrot = getc(rotors);
+        y1 = atoi(&bufrot);
+	wart1 = (x1*10)+y1;
+
+	// odfiltruj kreske
+        bufrot = getc(rotors);
+
+	// prawa wartosc
+        bufrot = getc(rotors);
+        x2 = atoi(&bufrot);
+        bufrot = getc(rotors);
+        y2 = atoi(&bufrot);
+	wart2 = (x2*10)+y2;
+
+	++index;
+	data->rotor3[index] = wart2;
+	data->rotor3rev[wart2] = wart1;
+
+        bufrot = getc(rotors);                          //odfiltruj enter
+    }
+}
+void WczytajRotorrev(struct EnigmaStruct* data)
+{
+int index = -1;
+    do{                          //odfiltruj etykiete
+    bufrot = getc(rotors);
+    }while(bufrot != '\n');
+
+    while(bufrot != EOF && index != 31){
+	int x1, y1, x2, y2, wart1, wart2;
+
+	// lewa wartosc
+        bufrot = getc(rotors);
+        x1 = atoi(&bufrot);
+        bufrot = getc(rotors);
+        y1 = atoi(&bufrot);
+	wart1 = (x1*10)+y1;
+
+	// odfiltruj kreske
+        bufrot = getc(rotors);
+
+	// prawa wartosc
+        bufrot = getc(rotors);
+
+        x2 = atoi(&bufrot);
+        bufrot = getc(rotors);
+        y2 = atoi(&bufrot);
+	wart2 = (x2*10)+y2;
+
+	if(wart1 <= 31)
+		data->rotorrev[wart1] = wart2;
+	else
+		data->rotorrev2[wart1-32] = wart2;
+	if(wart2 <= 31)
+		data->rotorrev[wart2] = wart1;
+	else
+		data->rotorrev2[wart2-32] = wart1;
+
+	++index;
+        bufrot = getc(rotors);                          //odfiltruj enter
+    }
+}
+void OtwarciePlikow()
+{
+    if( (in = fopen("plaintext.txt", "r")) == NULL )
+        Error(1);
+    if( (out = fopen("ciphertext.txt", "w")) == NULL )
+        Error(1);
+    if( (rotors = fopen("rotors.txt", "r")) == NULL )
+        Error(1);
+    if( (init = fopen("init.txt", "r")) == NULL )
+        Error(1);
+}
+void ZamknieciePlikow()
+{
+    if( fclose(out) != 0 )
+        Error(2);
+    if( fclose(in) != 0 )
+        Error(2);
+    if( fclose(rotors) != 0 )
+        Error(2);
+    if( fclose(init) != 0 )
+        Error(2);
+}
+void Error(int i)
+{
+    if(i==1)
+    {
+        printf("Blad przy otwieraniu pliku\n");
+        exit(i);
+    }
+    if(i==2)
+    {
+        printf("Blad przy zamykaniu pliku\n");
+        exit(i);
+    }
+}
+void WczytajInitPos(struct EnigmaStruct* data)
+{
+    bufrot = getc(init);                          //pobierz wartosci i przekonwertuj
+    int x = atoi(&bufrot);
+    bufrot = getc(init);
+    int y = atoi(&bufrot);
+    data->initpos1 = 10*x+y;
+	data->rots1 = 10*x+y;
+    bufrot = getc(init);                           //porzuc enter
+
+    bufrot = getc(init);                           //pobierz wartosci i przekonwertuj
+    x = atoi(&bufrot);
+    bufrot = getc(init);
+    y = atoi(&bufrot);
+    data->initpos2 = 10*x+y;
+	data->rots2 = 10*x+y;
+    bufrot = getc(init);                           //porzuc enter
+
+    bufrot = getc(init);                           //pobierz wartosci i przekonwertuj
+    x = atoi(&bufrot);
+    bufrot = getc(init);
+    y = atoi(&bufrot);
+    data->initpos3 = 10*x+y;
+	data->rots3 = 10*x+y;
+    bufrot = getc(init);                           //porzuc enter
+}
+
+void WczytajLinie()
+{
+    fgets(bufin, maxline, in);
+    printf("Wczytano: ");
+    printf(bufin);
+}
+void ZapiszLinie()
+{
+    fputs(bufout, out);
+    printf("Zapisano: ");
+    printf(bufout);
+    printf("\n");
+}
